@@ -1,23 +1,31 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
+    <h1>Three Value View</h1>
     <br>
-    <HelloWorld />
+    <ThreeValueViewCore id="ThreeValueViewCore" />
+    <br>
+    <hr>
+    <PrivacyPolicy id="PrivacyPolicy"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import ThreeValueViewCore from './components/ThreeValueViewCore.vue'
+import PrivacyPolicy from './components/PrivacyPolicy.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    ThreeValueViewCore,
+    PrivacyPolicy
   }
 }
 </script>
 
 <style>
+* {
+  background: #eeeeee;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -25,5 +33,13 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+#ThreeValueViewCore{
+  /* margin-top: 50px; */
+  margin-bottom: 50px;
+}
+#PrivacyPolicy {
+  margin-top: 50px;
+  margin-bottom: 20px;
 }
 </style>

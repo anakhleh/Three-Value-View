@@ -1,9 +1,5 @@
 <template>
   <label class="file-select">
-    <!-- <div class="select-button">
-      <span v-if="value">Selected File: {{value.name}}</span>
-      <span v-else>Select File</span>
-    </div> -->
     <input type="file" @change="handleFileChange"/>
     <br>
     <br>
@@ -16,12 +12,10 @@
 
 <script>
 import { Image } from 'image-js'
-// import { options } from 'image-js'
 
 export default {
-  name: 'hello',
+  name: 'ThreeValueViewCore',
   props: {
-    // value: File,
   },
   data(){
     return {
