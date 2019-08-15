@@ -14,8 +14,8 @@
     </p>
     <p>
       If you have any questions about this website's privacy policy or other website, please contact us at 
-      <a :href="contactEmailHref">{{contactEmail}}</a> or contact Alex through
-      <a :href="contactWebsite">{{contactWebsite}}</a>
+      <a :href="contactEmailHref">{{contactEmail}}</a> or contact us through
+      <a :href="contactWebsiteHref" target="noopener noreferrer">{{contactWebsite}}</a>
     </p>
   </section>
 
@@ -34,6 +34,7 @@ import { AppConfiguration } from '../../app.config.js'
         contactEmail: AppConfiguration.contactEmail,
         contactEmailHref: 'mailto:' + AppConfiguration.contactEmail,
         contactWebsite: AppConfiguration.contactWebsite,
+        contactWebsiteHref: 'https://' + AppConfiguration.contactWebsite
       }
     },
     methods: {
@@ -45,6 +46,5 @@ import { AppConfiguration } from '../../app.config.js'
 
 <style scoped lang="scss">
   .privacy-policy {
-
   }
 </style>
