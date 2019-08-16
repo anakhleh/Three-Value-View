@@ -29,82 +29,72 @@ export default {
       this.processedImg()
       console.log('hello')
     },
-    getMaxGreyscaleRGBPixelValue(image){
+    getMaxGreyscaleRGBPixelValue(greyImage){
       var maxValue = 0
-      for(var i = 0; i < image.size; i++){
-        var pixelVal = image.getPixel(i)[0]
+      for(var i = 0; i < greyImage.size; i++){
+        var pixelVal = greyImage.getPixel(i)[0]
         if (pixelVal > maxValue){
           maxValue = pixelVal
         }
       }
       return maxValue
     },
-    getMinGreyscaleRGBPixelValue(image){
+    getMinGreyscaleRGBPixelValue(greyImage){
       var minValue = 255
-      for(var i = 0; i < image.size; i++){
-        var pixelVal = image.getPixel(i)[0]
+      for(var i = 0; i < greyImage.size; i++){
+        var pixelVal = greyImage.getPixel(i)[0]
         if (pixelVal < minValue){
           minValue = pixelVal
         }
       }
       return minValue
-
     },
-    getBucketedGreyscaleRGBPixel(greyScaleRGBPixel, minGreyScaleValue, maxGreyScaleValue){
-      var lowerQuarterCutoff = ((minGreyScaleValue + maxGreyScaleValue)/4)
-      var upperQuarterCutoff = ((minGreyScaleValue + maxGreyScaleValue)/4)*3
-      var lowerThirdCutoff = ((minGreyScaleValue + maxGreyScaleValue)/3)
-      var upperThirdCutoff = ((minGreyScaleValue + maxGreyScaleValue)/3)*2
-      
-      if (greyScaleRGBPixel[0] < lowerThirdCutoff){
+    getBucketedGreyscaleRGBPixel(greyScaleRGBPixel,lowerCutoff, upperCutoff){
+      if (greyScaleRGBPixel[0] < lowerCutoff){
         return [0]
-      } else if (greyScaleRGBPixel[0] >= lowerThirdCutoff && greyScaleRGBPixel[0] < upperThirdCutoff){
+      } else if (greyScaleRGBPixel[0] >= lowerCutoff && greyScaleRGBPixel[0] < upperCutoff){
         return [127]
       } else {
         return [255]
       }
+    },
+    bucketImage(greyImage){
+      var minGreyScaleValue = this.getMinGreyscaleRGBPixelValue(greyImage)
+      var maxGreyScaleValue = this.getMaxGreyscaleRGBPixelValue(greyImage)
+      var lowerQuarterCutoff = ((minGreyScaleValue + maxGreyScaleValue)/4)
+      var upperQuarterCutoff = ((minGreyScaleValue + maxGreyScaleValue)/4)*3
+      var lowerThirdCutoff = ((minGreyScaleValue + maxGreyScaleValue)/3)
+      var upperThirdCutoff = ((minGreyScaleValue + maxGreyScaleValue)/3)*2
+
+      for(var i = 0; i < greyImage.size; i++){
+        greyImage.setPixel(i, 
+                        this.getBucketedGreyscaleRGBPixel(greyImage.getPixel(i),
+                                                          lowerThirdCutoff,
+                                                          upperThirdCutoff
+                                                          )
+                      )
+      }
+      return greyImage
+    },
+    threeValueViewDataURLBlurAndSinglePixelBucketingBased(imageJsImage){
+      imageJsImage = imageJsImage.grey({mergeAlpha: true})
+      imageJsImage = imageJsImage.gaussianFilter({
+        radius: Math.ceil((imageJsImage.width + imageJsImage.height)*0.005),
+        sigma: 1.5,
+      })
+      imageJsImage = this.bucketImage(imageJsImage)
+      return imageJsImage.toDataURL()
+    },
+    threeValueViewDataURLHistogramBased(imageJsImage){
+      imageJsImage = imageJsImage.grey({mergeAlpha: true})
+      // vsr threeBucketHistogram = imageJsImage.getG
     },
     processedImg(){
       if(this.src == ''){
         return ''
       } else {
         Image.load(this.src).then((image) =>{
-          console.log('[i] Greyscaling Image')
-          var grey = image.grey({mergeAlpha: true})
-          console.log('[i] Greyscaled Image')
-          console.log('[i] Blurring Image')
-          var blured = grey.blurFilter({radius: (((grey.width + grey.height)/2)/100)})
-          console.log('[i] Blurred Image')
-          console.log('[i] Resizing Image')
-          var resized = blured.resize({width: grey.width/4, preserveAspectRatio: true})
-          console.log('[i] Resized Image')
-          console.log('[i] Getting Min Grey Value')
-          var minGreyValue = this.getMinGreyscaleRGBPixelValue(resized)
-          console.log('[i] Got Min Grey Value: ', minGreyValue)
-          console.log('[i] Getting Max Grey Value')
-          var maxGreyValue = this.getMaxGreyscaleRGBPixelValue(resized)
-          console.log('[i] Got Max Grey Value:', maxGreyValue)
-          console.log('[i] Bucketing Image')
-          for(var i = 0; i < resized.size; i++){
-            // console.log(resized.getPixel(i))
-             resized.setPixel(i, 
-                              this.getBucketedGreyscaleRGBPixel(resized.getPixel(i),
-                                                                minGreyValue,
-                                                                maxGreyValue
-                                                              )
-                            )
-          }
-          console.log('[i] Bucketed Image')
-          // console.log('[i] Performing Secondary Blur on Image')
-          // resized = resized.blurFilter({radius: 3})
-          
-          this.pSrc = resized.toDataURL()
-          // var resized = 
-          console.log('[i] Bucketed Pixel Values')
-          // for
-          // this.pSrc = resized.toDataURL()
-          console.log(this.pSrc)
-          
+          this.pSrc = this.threeValueViewDataURLBlurAndSinglePixelBucketingBased(image)
         })
         .catch((e) => {
           console.log('Failed to load image: ', e)
